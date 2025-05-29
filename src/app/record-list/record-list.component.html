@@ -1,47 +1,38 @@
-<app-record-form (recordCreate)="createRecord($event)"></app-record-form>
-
-
-<button class="btn btn-primary mb-3" (click)="loadRecords()">Load Records</button>
-
 <div class="list-section records-container" *ngIf="records.length">
   <div class="record-card" *ngFor="let record of records; trackBy: trackById">
     <div class="card-body">
       <div *ngIf="editingId !== record.id; else editMode">
         <h5 class="card-title">{{ record.title }}</h5>
         <p class="card-text">{{ record.text }}</p>
-        <button
-          class="btn btn-warning btn-sm"
-          *ngIf="record.id !== undefined"
-          (click)="startEditing(record.id!)"
-        >
-          Edit
-        </button>
-        <button
-          class="btn btn-danger btn-sm"
-          *ngIf="record.id !== undefined"
-          (click)="deleteRecord(record.id!)"
-        >
-          Delete
-        </button>
+        <button class="btn btn-warning btn-sm" (click)="openEditModal(record.id)">Edit</button>
+        <button class="btn btn-danger btn-sm" (click)="deleteRecord(record.id)">Delete</button>
       </div>
       <ng-template #editMode>
-        <input
-          type="text"
-          class="form-control mb-2"
-          [(ngModel)]="record.title"
-          placeholder="Title"
-          required
-        >
-        <input
-          type="text"
-          class="form-control mb-2"
-          [(ngModel)]="record.text"
-          placeholder="Description"
-          required
-        >
-        <button class="btn btn-success btn-sm" (click)="saveRecord(record)">Save</button>
-        <button class="btn btn-secondary btn-sm" (click)="cancelEditing()">Cancel</button>
       </ng-template>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-primary mb-3" (click)="openCreateModal()">Create Record</button>
+
+<div class="modal fade" id="recordModal" tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="recordModalLabel">{{ isEditing ? 'Edit Record' : 'Create Record' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-record-form
+          (recordCreate)="createRecord($event)"
+          (recordUpdate)="saveRecord($event)"
+          [record]="selectedRecord"
+          [isEditing]="isEditing"
+        ></app-record-form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

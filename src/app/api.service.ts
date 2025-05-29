@@ -1,10 +1,19 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { RecordModel } from '../models/record.model';
+
+
+interface CreateRecordModel {
+  title: string;
+  text: string;
+  image?: string;
+  url?: string;
+  active?: number;
+  sort_order?: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +33,7 @@ export class ApiService {
     );
   }
 
-  public createRecord(record: RecordModel): Observable<RecordModel> {
+  public createRecord(record: CreateRecordModel): Observable<RecordModel> {
     const url = `${this.apiUrl}/api/posts`;
     console.log('Create URL:', url, 'Data:', record);
     return this.http.post<RecordModel>(url, record).pipe(
@@ -52,7 +61,7 @@ export class ApiService {
     const url = error.url ?? 'unknown URL';
     const status = error.status ?? 'unknown status';
     const statusText = error.statusText ?? 'unknown status text';
-    console.error('Error details:', { url, status, statusText, message: error.message });
+    console.error('Error details:', { url, status, statusText, message: error.message, error: error.error });
     return throwError(() => new Error(`Http failure response for ${url}: ${status} ${statusText}`));
   }
 }

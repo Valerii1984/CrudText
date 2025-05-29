@@ -1,24 +1,46 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, Input, Output, ViewChild, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RecordModel } from '../../models/record.model';
 
 @Component({
   selector: 'app-record-form',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './record-form.component.html',
   styleUrls: ['./record-form.component.scss']
 })
 export class RecordFormComponent {
+  @Input() record: RecordModel = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
+  @Input() isEditing: boolean = false;
   @Output() recordCreate = new EventEmitter<RecordModel>();
-  public newRecord: RecordModel = { id: 0, title: '', text: '' };
+  @Output() recordUpdate = new EventEmitter<RecordModel>();
+  public newRecord: RecordModel = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
 
-  onSubmit(form: NgForm): void {
-    if (form.valid) {
-      this.recordCreate.emit({ ...this.newRecord });
-      form.resetForm();
-      this.newRecord = { id: 0, title: '', text: '' };
+  @ViewChild('createForm') createForm!: NgForm;
+
+  get titleInvalidClass(): string {
+    return this.createForm?.controls['title']?.invalid && 
+           (this.createForm?.controls['title']?.dirty || this.createForm?.controls['title']?.touched)
+      ? 'is-invalid'
+      : '';
+  }
+
+  get descriptionInvalidClass(): string {
+    return this.createForm?.controls['description']?.invalid && 
+           (this.createForm?.controls['description']?.dirty || this.createForm?.controls['description']?.touched)
+      ? 'is-invalid'
+      : '';
+  }
+
+  onSubmit(): void {
+    if (this.createForm.valid) {
+      if (this.isEditing) {
+        this.recordUpdate.emit({ ...this.record });
+      } else {
+        this.recordCreate.emit({ ...this.newRecord });
+      }
+      this.createForm.resetForm();
+      this.newRecord = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
     }
   }
 }

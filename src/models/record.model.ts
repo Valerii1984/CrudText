@@ -6,6 +6,6 @@ export interface RecordModel {
   url?: string;
   active?: number;
   sort_order?: number;
-  created_at?: string;
-  updated_at?: string;
 }
+
+export type RecordWithId = RecordModel & { id: number };

@@ -3,25 +3,34 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecordFormComponent } from '../record-form/record-form.component';
 import { ApiService } from '../api.service';
-import { RecordModel } from '../../models/record.model';
+import { RecordModel, RecordWithId } from '../../models/record.model';
+
+declare let bootstrap: any;
 
 @Component({
   selector: 'app-record-list',
-  standalone: true,
   imports: [CommonModule, FormsModule, RecordFormComponent],
   templateUrl: './record-list.component.html',
 })
 export class RecordListComponent {
-  records: RecordModel[] = [];
-  editingId: number | null = null;
+  public records: RecordWithId[] = [];
+  public editingId: number | null = null;
+  public selectedRecord: RecordModel = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
+  public isEditing: boolean = false;
 
-  constructor(private apiService: ApiService) {}
+  private apiService: ApiService;
+
+  constructor(apiService: ApiService) {
+    this.apiService = apiService;
+  }
 
   loadRecords(): void {
     this.apiService.getRecords().subscribe({
       next: (records) => {
-        this.records = records;
-        console.log('Records loaded:', records);
+        this.records = records.filter((record): record is RecordWithId => 
+          record.id !== undefined && typeof record.id === 'number'
+        );
+        console.log('Records loaded:', this.records);
       },
       error: (error) => {
         console.error('Error loading records:', error);
@@ -43,7 +52,15 @@ export class RecordListComponent {
     this.apiService.createRecord(postData).subscribe({
       next: (response) => {
         console.log('Ответ сервера:', response);
-        this.records.push(response); 
+        if (response.id !== undefined && typeof response.id === 'number') {
+          this.records.push(response as RecordWithId);
+        }
+  
+        const modalElement = document.getElementById('recordModal');
+        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          modal.hide();
+        }
       },
       error: (error) => {
         console.error('Ошибка при запросе:', error);
@@ -51,19 +68,45 @@ export class RecordListComponent {
     });
   }
 
-  startEditing(id: number): void {
+  openCreateModal(): void {
+    this.isEditing = false;
+    this.selectedRecord = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
+    this.openModal();
+  }
+
+  openEditModal(id: number): void {
+    this.isEditing = true;
     this.editingId = id;
+    this.selectedRecord = { ...this.records.find(r => r.id === id)! };
+    this.openModal();
+  }
+
+  private openModal(): void {
+    const modalElement = document.getElementById('recordModal');
+    if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    } else {
+      console.error('Bootstrap Modal is not available. Ensure Bootstrap JS is loaded.');
+    }
   }
 
   saveRecord(record: RecordModel): void {
-    if (this.editingId !== null) {
-      this.apiService.updateRecord(this.editingId, record).subscribe({
+    if (typeof this.editingId === 'number') {
+      const currentId = this.editingId;
+      this.apiService.updateRecord(currentId, record).subscribe({
         next: () => {
           console.log('Record updated');
-          this.editingId = null;
-          const index = this.records.findIndex(r => r.id === this.editingId);
+          const index = this.records.findIndex(r => r.id === currentId);
           if (index !== -1) {
-            this.records[index] = record;
+            this.records[index] = { ...record, id: currentId } as RecordWithId;
+          }
+          this.editingId = null;
+          
+          const modalElement = document.getElementById('recordModal');
+          if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
           }
         },
         error: (error) => {
@@ -91,7 +134,7 @@ export class RecordListComponent {
     }
   }
 
-  trackById(index: number, record: RecordModel): number {
-    return record.id || index;
+  trackById(index: number, record: RecordWithId): number {
+    return record.id;
   }
 }
