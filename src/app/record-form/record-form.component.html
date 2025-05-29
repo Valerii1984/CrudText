@@ -1,0 +1,42 @@
+<div class="add-section">
+  <h2>CrudApp in the Jungle</h2>
+  <form (ngSubmit)="onSubmit(createForm)" #createForm="ngForm">
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        name="title"
+        [(ngModel)]="newRecord.title"
+        placeholder="Title"
+        required
+        #title="ngModel"
+        [ngClass]="{'is-invalid': title.invalid && (title.dirty || title.touched)}"
+      >
+      <div *ngIf="title.invalid && (title.dirty || title.touched)" class="invalid-feedback">
+        Title is required
+      </div>
+    </div>
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        name="description"
+        [(ngModel)]="newRecord.text"
+        placeholder="Description"
+        required
+        #description="ngModel"
+        [ngClass]="{'is-invalid': description.invalid && (description.dirty || description.touched)}"
+      >
+      <div *ngIf="description.invalid && (description.dirty || description.touched)" class="invalid-feedback">
+        Description is required
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="createForm.invalid"
+    >
+      Create
+    </button>
+  </form>
+</div>
