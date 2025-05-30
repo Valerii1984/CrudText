@@ -19,7 +19,7 @@ interface CreateRecordModel {
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly apiUrl: string = environment.apiUrl;
+  public readonly apiUrl: string = environment.apiUrl;
 
   constructor(private readonly http: HttpClient) {
     console.log('API URL:', this.apiUrl);
@@ -57,7 +57,7 @@ export class ApiService {
     );
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
+  public handleError(error: HttpErrorResponse): Observable<never> {
     const url = error.url ?? 'unknown URL';
     const status = error.status ?? 'unknown status';
     const statusText = error.statusText ?? 'unknown status text';

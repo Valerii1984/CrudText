@@ -18,7 +18,7 @@ export class RecordListComponent {
   public selectedRecord: RecordModel = { id: 0, title: '', text: '', image: '', url: '', active: 0, sort_order: 0 };
   public isEditing: boolean = false;
 
-  private apiService: ApiService;
+  public apiService: ApiService;
 
   constructor(apiService: ApiService) {
     this.apiService = apiService;
@@ -81,7 +81,7 @@ export class RecordListComponent {
     this.openModal();
   }
 
-  private openModal(): void {
+  public openModal(): void {
     const modalElement = document.getElementById('recordModal');
     if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement);
