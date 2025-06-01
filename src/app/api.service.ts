@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { RecordModel } from '../models/record.model';
 
-
+// Интерфейс для создания записи
 interface CreateRecordModel {
   title: string;
   text: string;
@@ -19,7 +19,7 @@ interface CreateRecordModel {
   providedIn: 'root'
 })
 export class ApiService {
-  public readonly apiUrl: string = environment.apiUrl;
+  private readonly apiUrl: string = environment.apiUrl;
 
   constructor(private readonly http: HttpClient) {
     console.log('API URL:', this.apiUrl);
@@ -27,7 +27,6 @@ export class ApiService {
 
   public getRecords(): Observable<RecordModel[]> {
     const url = `${this.apiUrl}/api/posts`;
-    console.log('Get URL:', url);
     return this.http.get<RecordModel[]>(url).pipe(
       catchError(this.handleError)
     );
@@ -35,29 +34,26 @@ export class ApiService {
 
   public createRecord(record: CreateRecordModel): Observable<RecordModel> {
     const url = `${this.apiUrl}/api/posts`;
-    console.log('Create URL:', url, 'Data:', record);
     return this.http.post<RecordModel>(url, record).pipe(
       catchError(this.handleError)
     );
   }
 
-  public updateRecord(id: number, record: RecordModel): Observable<RecordModel> {
+  public updateRecord(id: number, record: RecordModel): Observable<void> {
     const url = `${this.apiUrl}/api/posts/${id}`;
-    console.log('Update URL:', url, 'Data:', record);
-    return this.http.put<RecordModel>(url, record).pipe(
+    return this.http.put<void>(url, record).pipe(
       catchError(this.handleError)
     );
   }
 
   public deleteRecord(id: number): Observable<void> {
     const url = `${this.apiUrl}/api/posts/${id}`;
-    console.log('Delete URL:', url);
     return this.http.delete<void>(url).pipe(
       catchError(this.handleError)
     );
   }
 
-  public handleError(error: HttpErrorResponse): Observable<never> {
+  private handleError(error: HttpErrorResponse): Observable<never> {
     const url = error.url ?? 'unknown URL';
     const status = error.status ?? 'unknown status';
     const statusText = error.statusText ?? 'unknown status text';

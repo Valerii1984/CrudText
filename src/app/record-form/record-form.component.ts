@@ -19,17 +19,19 @@ export class RecordFormComponent {
   @ViewChild('createForm') createForm!: NgForm;
 
   get titleInvalidClass(): string {
-    return this.createForm?.controls['title']?.invalid && 
-           (this.createForm?.controls['title']?.dirty || this.createForm?.controls['title']?.touched)
-      ? 'is-invalid'
-      : '';
+    return this.isInvalidField('title') ? 'is-invalid' : '';
   }
 
   get descriptionInvalidClass(): string {
-    return this.createForm?.controls['description']?.invalid && 
-           (this.createForm?.controls['description']?.dirty || this.createForm?.controls['description']?.touched)
-      ? 'is-invalid'
-      : '';
+    return this.isInvalidField('description') ? 'is-invalid' : '';
+  }
+
+  private isInvalidField(key: string): boolean {
+    const controls = this.createForm?.controls;
+    if (!controls) return false;
+
+    const control = controls[key];
+    return control?.invalid && (control?.dirty || control?.touched);
   }
 
   onSubmit(): void {

@@ -1,21 +1,17 @@
 <div class="list-section records-container" *ngIf="records.length">
   <div class="record-card" *ngFor="let record of records; trackBy: trackById">
     <div class="card-body">
-      <div *ngIf="editingId !== record.id; else editMode">
-        <h5 class="card-title">{{ record.title }}</h5>
-        <p class="card-text">{{ record.text }}</p>
-        <button class="btn btn-warning btn-sm" (click)="openEditModal(record.id)">Edit</button>
-        <button class="btn btn-danger btn-sm" (click)="deleteRecord(record.id)">Delete</button>
-      </div>
-      <ng-template #editMode>
-      </ng-template>
+      <h5 class="card-title">{{ record.title }}</h5>
+      <p class="card-text">{{ record.text }}</p>
+      <button class="btn btn-warning btn-sm" (click)="openEditModal(record.id)">Edit</button>
+      <button class="btn btn-danger btn-sm" (click)="deleteRecord(record.id)">Delete</button>
     </div>
   </div>
 </div>
 
 <button class="btn btn-primary mb-3" (click)="openCreateModal()">Create Record</button>
 
-<div class="modal fade" id="recordModal" tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
+<div class="modal fade" #recordModal tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
